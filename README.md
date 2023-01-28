@@ -1,2 +1,3 @@
-# quidditch-manager
-quidditch manager game
+# quidditch
+
+Quidditch manager game
