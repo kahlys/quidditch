@@ -1,0 +1,19 @@
+POST http://localhost:8000/register
+
+{
+    "email": "harry.potter@hogwarts.uk",
+    "password": "slytherin"
+}
+
+###
+
+POST http://localhost:8000/login
+
+{
+    "email": "harry.potter@hogwarts.uk",
+    "password": "slytherin"
+}
+
+###
+
+GET http://localhost:8000/home
