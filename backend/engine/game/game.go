@@ -1,9 +1,10 @@
 package game
 
 import (
+	"math/rand"
+
 	"go.uber.org/zap"
 
-	"github.com/kahlys/quidditch/backend/dice"
 	"github.com/kahlys/quidditch/backend/engine"
 )
 
@@ -107,9 +108,18 @@ func (g *Game) simulateRoundSnitch() bool {
 }
 
 func snitchAppears(chance int) bool {
-	return dice.Roll(chance, 100, 1)
+	return diceRoll(chance, 100, 1)
 }
 
 func seekerFindAndCatchSnitch(player engine.Player) bool {
-	return dice.Roll(player.Power, player.Stamina, triesSnitch)
+	return diceRoll(player.Power, player.Stamina, triesSnitch)
+}
+
+func diceRoll(stat int, stamina int, nb int) bool {
+	for i := 0; i < nb; i++ {
+		if rand.Intn(101) > stat-(100-stamina) {
+			return false
+		}
+	}
+	return true
 }
