@@ -17,7 +17,7 @@ type handler struct {
 }
 
 func (h handler) handler() http.Handler {
-	r := mux.NewRouter()
+	r := mux.NewRouter().PathPrefix("/api/").Subrouter()
 
 	r.HandleFunc("/register", h.register).Methods("POST")
 	r.HandleFunc("/login", h.login).Methods("POST")
