@@ -1,14 +1,22 @@
 <template>
-  <v-container>
-    <v-form ref="form" v-model="valid" lazy-validation>
-      <v-text-field v-model="name" :rules="nameRules" label="Name" required></v-text-field>
-      <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
-      <v-text-field v-model="password" :rules="passwordRules" label="Password" required></v-text-field>
-      <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">
-        Register
-      </v-btn>
-    </v-form>
-  </v-container>
+  <v-card class="mx-auto" max-width="900">
+
+    <v-toolbar>
+      <v-toolbar-title>Register</v-toolbar-title>
+    </v-toolbar>
+
+    <v-container>
+      <v-form ref="form" v-model="valid" lazy-validation>
+        <v-text-field v-model="name" :rules="nameRules" label="Name" required></v-text-field>
+        <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
+        <v-text-field v-model="password" :rules="passwordRules" label="Password" required></v-text-field>
+        <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">
+          Register
+        </v-btn>
+        <span>Already have an account ? <a href="">Login</a></span>
+      </v-form>
+    </v-container>
+  </v-card>
 </template>
 
 <script>
@@ -40,31 +48,20 @@ export default {
 
   methods: {
     validate() {
-      console.log(this.name, this.email, this.password)
       axios
-        .post("http://localhost:8080/api/register",
+        .post("/api/register",
           {
             "name": this.name,
             "email": this.email,
             "password": this.password,
           },
         )
-        .then(response => {
-          this.result = response.data.exist
-        })
-    },
-  },
+      // .then(response => {
+      //   this.result = response.data.exist
+      // })
 
-  mounted() {
-    axios
-      .post("/api/register", {
-        "name": this.name,
-        "email": this.email,
-        "password": this.password,
-      },)
-      .then(response => {
-        this.result = response.data.exist
-      })
+      axios.get("/api/home")
+    },
   },
 }
 </script>

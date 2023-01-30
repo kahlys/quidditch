@@ -6,4 +6,15 @@ services:
       context: .
       dockerfile: deployment/Dockerfile.back
     ports:
-      - "8081:80"
+      - "8080:8080"
+    expose:
+      - 8080
+
+  frontend:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile.front
+    ports:
+      - 8081:80
+    depends_on:
+      - backend
