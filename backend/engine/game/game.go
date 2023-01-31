@@ -85,21 +85,21 @@ func (g *Game) simulateRound() {
 func (g *Game) simulateRoundSnitch() bool {
 	if g.home.Squad.Seeker.Power >= g.away.Squad.Seeker.Power {
 		if seekerFindAndCatchSnitch(g.home.Squad.Seeker) {
-			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.home.Name, "seeker", g.home.Squad.Seeker.Name)
+			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.home.Name, "seeker", g.home.Squad.Seeker.FirstName)
 			g.result.ScoreHome += scoreSnitch
 			return true
 		} else if seekerFindAndCatchSnitch(g.away.Squad.Seeker) {
-			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.away.Name, "seeker", g.away.Squad.Seeker.Name)
+			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.away.Name, "seeker", g.away.Squad.Seeker.FirstName)
 			g.result.ScoreAway += scoreSnitch
 			return true
 		}
 	} else {
 		if seekerFindAndCatchSnitch(g.away.Squad.Seeker) {
-			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.away.Name, "seeker", g.away.Squad.Seeker.Name)
+			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.away.Name, "seeker", g.away.Squad.Seeker.FirstName)
 			g.result.ScoreAway += scoreSnitch
 			return true
 		} else if seekerFindAndCatchSnitch(g.home.Squad.Seeker) {
-			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.home.Name, "seeker", g.home.Squad.Seeker.Name)
+			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.home.Name, "seeker", g.home.Squad.Seeker.FirstName)
 			g.result.ScoreHome += scoreSnitch
 			return true
 		}
