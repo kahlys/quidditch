@@ -4,17 +4,27 @@
  * Bootstraps Vuetify and other plugins then mounts the App`
  */
 
-// Components
-import App from './App.vue'
+import App from "./App.vue"; // Components
+import { createApp } from "vue"; // Composables
+import { registerPlugins } from "@/plugins"; // Plugins
 
-// Composables
-import { createApp } from 'vue'
+import axios from "axios";
+import router from "./router";
 
-// Plugins
-import { registerPlugins } from '@/plugins'
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response.status === 401) {
+      router.push("/login");
+    }
+    return Promise.reject(error);
+  }
+);
 
-const app = createApp(App)
+const app = createApp(App);
 
-registerPlugins(app)
+registerPlugins(app);
 
-app.mount('#app')
+app.mount("#app");
