@@ -6,14 +6,23 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"go.uber.org/zap"
+
+	"github.com/kahlys/quidditch/backend"
 )
 
-func Handler() http.Handler {
-	h := handler{}
+func Handler(logger *zap.Logger, s *backend.Service) http.Handler {
+	h := handler{
+		logger: logger,
+		s:      s,
+	}
 	return h.handler()
 }
 
 type handler struct {
+	logger *zap.Logger
+
+	s *backend.Service
 }
 
 func (h handler) handler() http.Handler {
@@ -44,9 +53,17 @@ func (h handler) register(w http.ResponseWriter, r *http.Request) {
 	user.ID = len(Users) + 1
 	Users = append(Users, user)
 
+	err = h.s.Register(user.Name, user.Email, user.Password)
+	if err != nil {
+		h.logger.Sugar().Errorw("user registration", "message", err.Error())
+		http.Error(w, "user registration", http.StatusInternalServerError)
+		return
+	}
+
 	token, err := generateAccessToken(user.ID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.logger.Sugar().Errorw("token generation", "message", err.Error())
+		http.Error(w, "token generation", http.StatusInternalServerError)
 		return
 	}
 
@@ -71,7 +88,7 @@ func (h handler) login(w http.ResponseWriter, r *http.Request) {
 		if u.Email == user.Email && u.Password == user.Password {
 			token, err := generateAccessToken(u.ID)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, "token generation", http.StatusInternalServerError)
 				return
 			}
 

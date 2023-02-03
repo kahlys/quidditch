@@ -9,7 +9,9 @@ import (
 	"github.com/rs/cors"
 	"go.uber.org/zap"
 
+	"github.com/kahlys/quidditch/backend"
 	"github.com/kahlys/quidditch/backend/api"
+	"github.com/kahlys/quidditch/backend/store"
 )
 
 var fAddr = flag.String("addr", ":8080", "listening address")
@@ -25,8 +27,17 @@ func main() {
 		AllowCredentials: true,
 	})
 
-	chain := alice.New(c.Handler, mwDebug(logger)).Then(api.Handler())
+	db, err := store.NewDatabase("postgres://postgres:postgres@db:5432/postgres?sslmode=disable")
+	if err != nil {
+		logger.Sugar().Fatalf("connecting to database: %v", err)
+	}
 
+	service := &backend.Service{
+		Store: db,
+	}
+
+	handler := api.Handler(logger, service)
+	chain := alice.New(c.Handler, mwDebug(logger)).Then(handler)
 	serv := http.Server{
 		Addr:    *fAddr,
 		Handler: chain,
