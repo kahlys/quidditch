@@ -66,16 +66,14 @@ export default {
 
     methods: {
         toLogin() {
-            console.log("clie login")
             this.register = false
         },
         toRegister() {
-            console.log("clie register")
             this.register = true
         },
         apiRegister() {
             axios
-                .post("http://localhost:8080/api/register", {
+                .post("/api/register", {
                     "name": this.name,
                     "email": this.email,
                     "password": this.password,
@@ -89,7 +87,7 @@ export default {
         },
         apiLogin() {
             axios
-                .post("http://localhost:8080/api/login", {
+                .post("/api/login", {
                     "email": this.email,
                     "password": this.password,
                 }).then(response => {
