@@ -11,12 +11,13 @@ type User struct {
 
 // Player describe a player with his infos and stats.
 type Player struct {
-	FirstName string
-	LastName  string
-	Country   string
-	Role      string
-	Stamina   int
-	Power     int
+	ID        int    `json:"id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Country   string `json:"country"`
+	Role      string `json:"role"`
+	Stamina   int    `json:"stamina"`
+	Power     int    `json:"power"`
 }
 
 type Squad struct {
@@ -30,6 +31,7 @@ type Squad struct {
 }
 
 type Team struct {
+	ID    int
 	Name  string
 	Squad Squad
 }

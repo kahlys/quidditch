@@ -1,13 +1,14 @@
 package backend
 
 const (
-	CountryBulgary      = "bulgaria"
+	CountryBulgaria     = "bulgaria"
 	CountryEngland      = "england"
 	CountryFrance       = "france"
 	CountryGermany      = "germany"
-	CountryIrland       = "ireland"
+	CountryIreland      = "ireland"
 	CountrySpain        = "spain"
 	CountryUnitedStates = "us"
+	CountryCanada       = "canada"
 )
 
 const (
@@ -17,11 +18,33 @@ const (
 	RoleKeeper = "keeper"
 )
 
-var countries = []string{CountryBulgary, CountryEngland, CountryFrance, CountryGermany, CountryIrland, CountrySpain, CountryUnitedStates}
+var countries = []string{CountryBulgaria, CountryEngland, CountryFrance, CountryGermany, CountryIreland, CountrySpain, CountryUnitedStates}
 
 var roles = []string{RoleBeater, RoleChaser, RoleKeeper, RoleSeeker}
 
 var firstNameByCountry = map[string][]string{
+	CountryCanada: {
+		"Liam",
+		"Noah",
+		"Ethan",
+		"Oliver",
+		"William",
+		"James",
+		"Benjamin",
+		"Elijah",
+		"Lucas",
+		"Mason",
+		"Emma",
+		"Olivia",
+		"Ava",
+		"Isabella",
+		"Sophia",
+		"Charlotte",
+		"Amelia",
+		"Mia",
+		"Harper",
+		"Evelyn",
+	},
 	CountryFrance: {
 		"Pierre",
 		"Paul",
@@ -88,7 +111,8 @@ var firstNameByCountry = map[string][]string{
 		"Scarlett",
 		"Lily",
 	},
-	CountryIrland: {
+	CountryIreland: {
+		"Ashling",
 		"Liam",
 		"Noah",
 		"Jack",
@@ -132,7 +156,7 @@ var firstNameByCountry = map[string][]string{
 		"Paula",
 		"Cristina",
 	},
-	CountryBulgary: {
+	CountryBulgaria: {
 		"Dimitar",
 		"Georgi",
 		"Ivan",
@@ -179,6 +203,28 @@ var firstNameByCountry = map[string][]string{
 }
 
 var lastNameByCountry = map[string][]string{
+	CountryCanada: {
+		"Smith",
+		"Johnson",
+		"Brown",
+		"Jones",
+		"Taylor",
+		"Wilson",
+		"Davis",
+		"Anderson",
+		"Martin",
+		"Thompson",
+		"White",
+		"Harris",
+		"Young",
+		"Allen",
+		"King",
+		"Wright",
+		"Green",
+		"Hall",
+		"Adams",
+		"Baker",
+	},
 	CountryFrance: {
 		"Dubois",
 		"Moreau",
@@ -245,7 +291,7 @@ var lastNameByCountry = map[string][]string{
 		"White",
 		"Cooper",
 	},
-	CountryIrland: {
+	CountryIreland: {
 		"Murphy",
 		"Kelly",
 		"O'Brien",
@@ -257,6 +303,7 @@ var lastNameByCountry = map[string][]string{
 		"Kennedy",
 		"O'Connor",
 		"Doyle",
+		"Mooney",
 		"McDonagh",
 		"McManus",
 		"O'Neill",
@@ -289,7 +336,7 @@ var lastNameByCountry = map[string][]string{
 		"Castro",
 		"Ortiz",
 	},
-	CountryBulgary: {
+	CountryBulgaria: {
 		"Ivanov",
 		"Petrov",
 		"Georgiev",

@@ -34,6 +34,7 @@ func (h handler) handler() http.Handler {
 	rAuth := r.NewRoute().Subrouter()
 	rAuth.Use(h.mwAuth)
 	rAuth.HandleFunc("/home", h.home).Methods("GET")
+	rAuth.HandleFunc("/team", h.team).Methods("GET")
 
 	return r
 }
@@ -104,4 +105,29 @@ func (h handler) home(w http.ResponseWriter, r *http.Request) {
 	teamID := r.Context().Value(ctxTeamID).(int)
 
 	w.Write([]byte(fmt.Sprintf("Welcome user %v with team %v", userID, teamID)))
+}
+
+type teamGetResponse struct {
+	Name    string           `json:"name,omitempty"`
+	Players []backend.Player `json:"players,omitempty"`
+}
+
+// team handles team endpoint
+func (h handler) team(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value(ctxUserID).(int)
+	teamID := r.Context().Value(ctxTeamID).(int)
+
+	team, err := h.s.Team(teamID)
+	if err != nil {
+		h.logger.Sugar().Errorw("get team informations", "message", err.Error(), "teamid", teamID, "userid", userID)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(teamGetResponse{Name: team.Name, Players: team.Players()})
+	if err != nil {
+		h.logger.Sugar().Errorw("team json encoding response", "message", err.Error(), "teamid", teamID, "userid", userID)
+		http.Error(w, "JSON error", http.StatusInternalServerError)
+		return
+	}
 }

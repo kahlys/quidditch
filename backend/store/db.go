@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -128,4 +129,87 @@ func (db *Database) RegisterUser(user backend.User, encPassword string, team bac
 	}
 
 	return userid, teamid, err
+}
+
+func (db *Database) Team(teamid int) (backend.Team, error) {
+	team := backend.Team{ID: teamid}
+
+	tx, err := db.Begin(context.TODO())
+	if err != nil {
+		return backend.Team{}, err
+	}
+	defer tx.Rollback(context.TODO())
+
+	err = tx.QueryRow(
+		context.TODO(),
+		`SELECT name FROM teams WHERE id = $1`,
+		teamid,
+	).Scan(&team.Name)
+	if err != nil {
+		return backend.Team{}, err
+	}
+
+	row, err := tx.Query(
+		context.TODO(),
+		`SELECT id, first_name, last_name, nationality, power, stamina, position FROM players WHERE team_id=$1`,
+		teamid,
+	)
+	if err != nil {
+		return backend.Team{}, err
+	}
+	defer row.Close()
+
+	counter := 0
+	counterChaser := 0
+	counterBeater := 0
+	for row.Next() {
+		counter++
+		var p backend.Player
+		err = row.Scan(&p.ID, &p.FirstName, &p.LastName, &p.Country, &p.Power, &p.Stamina, &p.Role)
+		if err != nil {
+			return backend.Team{}, err
+		}
+		switch p.Role {
+		case backend.RoleSeeker:
+			team.Squad.Seeker = p
+		case backend.RoleKeeper:
+			team.Squad.Keeper = p
+		case backend.RoleBeater:
+			counterBeater++
+			switch counterBeater {
+			case 1:
+				team.Squad.Beater1 = p
+			case 2:
+				team.Squad.Beater2 = p
+			default:
+				return backend.Team{}, fmt.Errorf("too many players for role %v", p.Role)
+			}
+		case backend.RoleChaser:
+			counterChaser++
+			switch counterChaser {
+			case 1:
+				team.Squad.Chaser1 = p
+			case 2:
+				team.Squad.Chaser2 = p
+			case 3:
+				team.Squad.Chaser3 = p
+			default:
+				return backend.Team{}, fmt.Errorf("too many players for role %v", p.Role)
+			}
+		default:
+			return backend.Team{}, fmt.Errorf("unknown role %v", p.Role)
+		}
+	}
+	row.Close()
+
+	if counter != 7 {
+		return backend.Team{}, fmt.Errorf("team must have 7 players but found %v", counter)
+	}
+
+	err = tx.Commit(context.TODO())
+	if err != nil {
+		return backend.Team{}, err
+	}
+
+	return team, nil
 }

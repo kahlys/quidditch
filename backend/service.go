@@ -61,3 +61,8 @@ func (s *Service) AuthUser(user User) (User, error) {
 
 	return u, nil
 }
+
+// Team return the team name and players.
+func (s *Service) Team(teamid int) (Team, error) {
+	return s.Store.Team(teamid)
+}
