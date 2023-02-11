@@ -7,32 +7,27 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/kahlys/quidditch/backend"
 )
-
-// User struct to hold user information
-type User struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
 
 type Claims struct {
 	UserID int `json:"userid"`
+	TeamID int `json:"teamid"`
 	jwt.RegisteredClaims
 }
 
 // Users hold all registered users (TODO: use db instead)
-var Users []User
+var Users []backend.User
 
 // TODO: better generation
 var jwtSecret = []byte("secret")
 
-func generateAccessToken(userID int) (string, error) {
+func generateAccessToken(userID int, teamID int) (string, error) {
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		&Claims{
 			UserID: userID,
+			TeamID: teamID,
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(time.Now().Add(48 * time.Hour)),
 			},
@@ -65,6 +60,7 @@ func validateAccessToken(tokenString string) (*jwt.Token, *Claims, error) {
 type contextKey string
 
 var ctxUserID = contextKey("userID")
+var ctxTeamID = contextKey("teamID")
 
 // mwAuth is a middleware for authentication
 func (h handler) mwAuth(next http.Handler) http.Handler {
@@ -89,6 +85,7 @@ func (h handler) mwAuth(next http.Handler) http.Handler {
 
 		// Passer l'userID au handler protégé
 		ctx := context.WithValue(r.Context(), ctxUserID, claims.UserID)
+		ctx = context.WithValue(ctx, ctxTeamID, claims.TeamID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

@@ -32,9 +32,7 @@ func main() {
 		logger.Sugar().Fatalf("connecting to database: %v", err)
 	}
 
-	service := &backend.Service{
-		Store: db,
-	}
+	service := backend.NewService(logger, db)
 
 	handler := api.Handler(logger, service)
 	chain := alice.New(c.Handler, mwDebug(logger)).Then(handler)

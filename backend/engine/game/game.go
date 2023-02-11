@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/kahlys/quidditch/backend/engine"
+	"github.com/kahlys/quidditch/backend"
 )
 
 const (
@@ -29,11 +29,11 @@ type Game struct {
 	id     int
 	result Result
 
-	home engine.Team
-	away engine.Team
+	home backend.Team
+	away backend.Team
 }
 
-func NewGame(logger *zap.Logger, id int, home, away engine.Team) *Game {
+func NewGame(logger *zap.Logger, id int, home, away backend.Team) *Game {
 	return &Game{
 		logger: logger,
 
@@ -111,7 +111,7 @@ func snitchAppears(chance int) bool {
 	return diceRoll(chance, 100, 1)
 }
 
-func seekerFindAndCatchSnitch(player engine.Player) bool {
+func seekerFindAndCatchSnitch(player backend.Player) bool {
 	return diceRoll(player.Power, player.Stamina, triesSnitch)
 }
 

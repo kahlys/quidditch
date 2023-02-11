@@ -1,4 +1,14 @@
-POST http://localhost:8000/register
+POST http://localhost:8080/api/register
+
+{
+    "name": "harry potter",
+    "email": "harry.potter@hogwarts.uk",
+    "password": "slytherin"
+}
+
+###
+
+POST http://localhost:8080/api/login
 
 {
     "email": "harry.potter@hogwarts.uk",
@@ -7,13 +17,4 @@ POST http://localhost:8000/register
 
 ###
 
-POST http://localhost:8000/login
-
-{
-    "email": "harry.potter@hogwarts.uk",
-    "password": "slytherin"
-}
-
-###
-
-GET http://localhost:8000/home
+GET http://localhost:8080/api/home

@@ -1,4 +1,4 @@
-package gen
+package backend
 
 import (
 	"testing"

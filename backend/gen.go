@@ -1,22 +1,33 @@
-package gen
+package backend
 
-import (
-	"math/rand"
+import "math/rand"
 
-	"github.com/kahlys/quidditch/backend/engine"
-)
+func GenerateFirstTeam(name string) Team {
+	return Team{
+		Name: name,
+		Squad: Squad{
+			Seeker:  generatePlayerWithRole(1, RoleSeeker),
+			Keeper:  generatePlayerWithRole(1, RoleKeeper),
+			Beater1: generatePlayerWithRole(1, RoleBeater),
+			Beater2: generatePlayerWithRole(1, RoleBeater),
+			Chaser1: generatePlayerWithRole(1, RoleChaser),
+			Chaser2: generatePlayerWithRole(1, RoleChaser),
+			Chaser3: generatePlayerWithRole(1, RoleChaser),
+		},
+	}
+}
 
-func generatePlayers() []engine.Player {
-	players := []engine.Player{}
+func generatePlayers() []Player {
+	players := []Player{}
 	for i := 0; i < 10; i++ {
 		players = append(players, generatePlayer(0))
 	}
 	return players
 }
 
-func generatePlayer(level int) engine.Player {
+func generatePlayer(level int) Player {
 	country := countries[rand.Intn(len(countries))]
-	p := engine.Player{
+	p := Player{
 		FirstName: firstNameByCountry[country][rand.Intn(len(firstNameByCountry[country]))],
 		LastName:  lastNameByCountry[country][rand.Intn(len(lastNameByCountry[country]))],
 		Role:      roles[rand.Intn(len(roles))],
@@ -25,6 +36,12 @@ func generatePlayer(level int) engine.Player {
 		Stamina:   100,
 	}
 
+	return p
+}
+
+func generatePlayerWithRole(level int, role string) Player {
+	p := generatePlayer(level)
+	p.Role = role
 	return p
 }
 
