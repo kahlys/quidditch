@@ -11,12 +11,15 @@ import { registerPlugins } from "@/plugins"; // Plugins
 import axios from "axios";
 import router from "./router";
 
+axios.defaults.withCredentials = true;
+
 axios.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
     if (error.response.status === 401) {
+      console.log("HALLO");
       router.push("/login");
     }
     return Promise.reject(error);

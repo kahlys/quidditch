@@ -20,13 +20,25 @@ const routes = [
   },
   {
     path: "/login",
-    component: () => import("@/layouts/default/Default.vue"),
+    component: () => import("@/layouts/login/Default.vue"),
     children: [
       {
         path: "",
         name: "Login",
         component: () =>
           import(/* webpackChunkName: "login" */ "@/views/Login.vue"),
+      },
+    ],
+  },
+  {
+    path: "/team",
+    component: () => import("@/layouts/default/Default.vue"),
+    children: [
+      {
+        path: "",
+        name: "Team",
+        component: () =>
+          import(/* webpackChunkName: "login" */ "@/views/Team.vue"),
       },
     ],
   },

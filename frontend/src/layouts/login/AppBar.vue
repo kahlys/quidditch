@@ -1,17 +1,9 @@
 <template>
   <v-app-bar>
-    <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     <v-app-bar-title>
       Quidditch Manager
     </v-app-bar-title>
   </v-app-bar>
-  <v-navigation-drawer v-model="drawer" temporary>
-    <v-list>
-      <v-list-item v-for="item in items" :key="item.title" :to="item.path" @click="drawer = false">
-        {{ item.title }}
-      </v-list-item>
-    </v-list>
-  </v-navigation-drawer>
 </template>
 
 <script>

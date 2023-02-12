@@ -79,6 +79,8 @@ export default {
                     "password": this.password,
                 }).then(response => {
                     if (response.status === 200) {
+                        console.log(response.data)
+                        axios.defaults.headers.common["Cookie"] = response.data.cookie;
                         this.$router.push('/')
                     }
                 }).catch(error => {
@@ -91,7 +93,10 @@ export default {
                     "email": this.email,
                     "password": this.password,
                 }).then(response => {
+                    console.log("yo", response.data)
+                    console.log("yo", response)
                     if (response.status === 200) {
+                        axios.defaults.headers.common["Cookie"] = response.data.cookie;
                         this.$router.push('/')
                     }
                 }).catch(error => {
