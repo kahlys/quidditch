@@ -213,3 +213,61 @@ func (db *Database) Team(teamid int) (backend.Team, error) {
 
 	return team, nil
 }
+
+// RecruitablePlayers return the list of recruitable players
+func (db *Database) RecruitablePlayers(context.Context) ([]backend.Player, error) {
+	row, err := db.Query(
+		context.TODO(),
+		`SELECT id, first_name, last_name, nationality, power, stamina, position FROM players WHERE team_id IS NULL`,
+	)
+	if err != nil {
+		return []backend.Player{}, err
+	}
+	defer row.Close()
+
+	players := []backend.Player{}
+	for row.Next() {
+		p := backend.Player{}
+		err = row.Scan(&p.ID, &p.FirstName, &p.LastName, &p.Country, &p.Power, &p.Stamina, &p.Role)
+		if err != nil {
+			return []backend.Player{}, err
+		}
+		players = append(players, p)
+	}
+
+	return players, nil
+}
+
+// EditRecruitablePlayers replace recruitable players
+func (db *Database) EditRecruitablePlayers(ctx context.Context, players []backend.Player) error {
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	_, err = tx.Exec(
+		context.TODO(),
+		`DELETE FROM players WHERE team_id IS NULL`,
+	)
+	if err != nil {
+		return err
+	}
+
+	for _, p := range players {
+		_, err = tx.Exec(
+			context.TODO(),
+			`INSERT INTO players (first_name, last_name, nationality, power, stamina, position) VALUES ($1, $2, $3, $4, $5, $6)`,
+			p.FirstName, p.LastName, p.Country, p.Power, p.Stamina, p.Role,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	err = tx.Commit(context.TODO())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -19,8 +19,10 @@ func GenerateFirstTeam(name string) Team {
 
 func generatePlayers() []Player {
 	players := []Player{}
-	for i := 0; i < 10; i++ {
-		players = append(players, generatePlayer(0))
+	for level := 0; level <= 5; level++ {
+		for i := 0; i < 10; i++ {
+			players = append(players, generatePlayer(level))
+		}
 	}
 	return players
 }

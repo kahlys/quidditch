@@ -35,6 +35,7 @@ func (h handler) handler() http.Handler {
 	rAuth.Use(h.mwAuth)
 	rAuth.HandleFunc("/home", h.home).Methods("GET")
 	rAuth.HandleFunc("/team", h.team).Methods("GET")
+	rAuth.HandleFunc("/shop/players", h.recruitablePlayers).Methods("GET")
 
 	return r
 }
@@ -107,7 +108,7 @@ func (h handler) home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf("Welcome user %v with team %v", userID, teamID)))
 }
 
-type teamGetResponse struct {
+type teamResponse struct {
 	Name    string           `json:"name,omitempty"`
 	Players []backend.Player `json:"players,omitempty"`
 }
@@ -119,15 +120,35 @@ func (h handler) team(w http.ResponseWriter, r *http.Request) {
 
 	team, err := h.s.Team(teamID)
 	if err != nil {
-		h.logger.Sugar().Errorw("get team informations", "message", err.Error(), "teamid", teamID, "userid", userID)
+		h.logger.Sugar().Errorw("failed to get team list", "message", err.Error(), "teamid", teamID, "userid", userID)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(teamGetResponse{Name: team.Name, Players: team.Players()})
+	err = json.NewEncoder(w).Encode(teamResponse{Name: team.Name, Players: team.Players()})
 	if err != nil {
-		h.logger.Sugar().Errorw("team json encoding response", "message", err.Error(), "teamid", teamID, "userid", userID)
+		h.logger.Sugar().Errorw("failed to encode team list", "message", err.Error(), "teamid", teamID, "userid", userID)
 		http.Error(w, "JSON error", http.StatusInternalServerError)
+		return
+	}
+}
+
+type recruitablePlayersResponse struct {
+	Players []backend.Player `json:"players,omitempty"`
+}
+
+func (h handler) recruitablePlayers(w http.ResponseWriter, r *http.Request) {
+	players, err := h.s.RecruitablePlayers()
+	if err != nil {
+		h.logger.Sugar().Errorw("failed to get recruitable players", "message", err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(recruitablePlayersResponse{Players: players})
+	if err != nil {
+		h.logger.Sugar().Errorw("failed to encode recruitable players", "message", err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 }

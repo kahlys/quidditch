@@ -83,7 +83,6 @@ func (h handler) mwAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		// Passer l'userID au handler protégé
 		ctx := context.WithValue(r.Context(), ctxUserID, claims.UserID)
 		ctx = context.WithValue(ctx, ctxTeamID, claims.TeamID)
 		next.ServeHTTP(w, r.WithContext(ctx))

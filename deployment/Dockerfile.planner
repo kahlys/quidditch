@@ -1,0 +1,8 @@
+FROM golang as builder
+WORKDIR /myapp
+ADD . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o qmplanner ./backend/cmd/qmplanner/main.go
+
+FROM alpine
+COPY --from=builder myapp/qmplanner .
+ENTRYPOINT [ "./qmplanner" ]

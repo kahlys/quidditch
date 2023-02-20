@@ -18,3 +18,11 @@ POST http://localhost:8080/api/login
 ###
 
 GET http://localhost:8080/api/home
+
+###
+
+GET http://localhost:8080/api/team
+
+###
+
+GET http://localhost:8080/api/shop/players

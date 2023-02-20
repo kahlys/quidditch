@@ -1,9 +1,9 @@
 FROM golang as builder
 WORKDIR /myapp
 ADD . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o gmserv ./backend/cmd/qmserv/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o qmserv ./backend/cmd/qmserv/main.go
 
 FROM alpine
-COPY --from=builder myapp/gmserv .
+COPY --from=builder myapp/qmserv .
 EXPOSE 8080
-ENTRYPOINT [ "./gmserv" ]
+ENTRYPOINT [ "./qmserv" ]

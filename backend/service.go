@@ -1,12 +1,23 @@
 package backend
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type Store interface {
+	UpdateUserLastLogin(userid int) error
+	User(userid int) (User, error)
+	UserByEmail(email string) (User, error)
+	RegisterUser(user User, encPassword string, team Team) (userID int, teamID int, err error)
+	Team(teamid int) (Team, error)
+
+	RecruitablePlayers(context.Context) ([]Player, error)
+}
 
 type Service struct {
 	logger *zap.Logger
@@ -65,4 +76,9 @@ func (s *Service) AuthUser(user User) (User, error) {
 // Team return the team name and players.
 func (s *Service) Team(teamid int) (Team, error) {
 	return s.Store.Team(teamid)
+}
+
+// RecruitablePlayers return available players to recruit.
+func (s *Service) RecruitablePlayers() ([]Player, error) {
+	return s.Store.RecruitablePlayers(context.TODO())
 }
