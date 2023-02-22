@@ -1,8 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:gui/api.dart';
 import 'package:gui/pages/shop.dart';
 import 'package:gui/widgets/drawer.dart';
-
-import 'api.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,6 +17,9 @@ class MyApp extends StatelessWidget {
       title: 'Quidditch Manager',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+      ),
+      scrollBehavior: MaterialScrollBehavior().copyWith(
+        dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.stylus, PointerDeviceKind.unknown},
       ),
       initialRoute: '/',
       routes: {
@@ -54,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-       drawer: const AppDrawer(),
+      drawer: const AppDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

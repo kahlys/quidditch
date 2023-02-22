@@ -14,7 +14,7 @@ class DioClient {
       required String password}) async {
     try {
       Response userData = await _dio.post(
-        '($_baseUrl}/login',
+        '$_baseUrl/login',
         data: jsonEncode({
           "name": name,
           "email": email,
@@ -35,18 +35,8 @@ class DioClient {
     }
   }
 
-  Future<List<Player>> shopPlayer(String url) async {
-    Response response = await _dio.get('($_baseUrl}/shop/players');
-
-    if (response.statusCode == 200) {
-      return response.data;
-    } else {
-      throw Exception('Failed to load data');
-    }
-  }
-
   Future<List<Player>> fetchPlayers() async {
-    final response = await _dio.get('($_baseUrl}/shop/players');
+    final response = await _dio.get('$_baseUrl/shop/players');
     if (response.statusCode == 200) {
       final data = json.decode(response.data) as Map<String, dynamic>;
       final players = data['players'] as List<dynamic>;
