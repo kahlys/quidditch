@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gui/pages/shop.dart';
+import 'package:gui/widgets/drawer.dart';
 
 import 'api.dart';
 
@@ -53,25 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-       drawer: Drawer(
-         child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              DrawerHeader(
-                child: Text('Menu'),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-              ),
-              ListTile(
-                title: Text('Shop'),
-                onTap: () {
-                  Navigator.pushNamed(context, '/shop');
-                },
-              ),
-            ],
-          ),
-       ),
+       drawer: const AppDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
