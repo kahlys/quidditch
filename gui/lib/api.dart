@@ -6,6 +6,8 @@ import 'package:gui/models/player.dart';
 class DioClient {
   final Dio _dio = Dio();
 
+  // final _baseUrl = '/api';
+  // final _baseUrl = 'http://backend:8080/api';
   final _baseUrl = 'http://localhost:8080/api';
 
   Future? login(
