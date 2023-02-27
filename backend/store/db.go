@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/rs/zerolog/log"
+
 	"github.com/kahlys/quidditch/backend"
 )
 
@@ -115,7 +117,7 @@ func (db *Database) RegisterUser(user backend.User, encPassword string, team bac
 	for _, p := range team.Players() {
 		_, err = tx.Exec(
 			context.TODO(),
-			`INSERT INTO players (first_name, last_name, nationality, power, stamina, position, team_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+			`INSERT INTO players (first_name, last_name, nationality, power, stamina, position, starting, team_id) VALUES ($1, $2, $3, $4, $5, $6, true, $7)`,
 			p.FirstName, p.LastName, p.Country, p.Power, p.Stamina, p.Role, teamid,
 		)
 		if err != nil {
@@ -129,6 +131,42 @@ func (db *Database) RegisterUser(user backend.User, encPassword string, team bac
 	}
 
 	return userid, teamid, err
+}
+
+func (db *Database) InitBotTeam(ctx context.Context, team backend.Team) error {
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	teamid := 0
+	err = tx.QueryRow(
+		ctx,
+		`INSERT INTO teams (name) VALUES ($1) RETURNING id`,
+		team.Name,
+	).Scan(&teamid)
+	if err != nil {
+		return err
+	}
+
+	for _, p := range team.Players() {
+		_, err = tx.Exec(
+			ctx,
+			`INSERT INTO players (first_name, last_name, nationality, power, stamina, position, starting, team_id) VALUES ($1, $2, $3, $4, $5, $6, true, $7)`,
+			p.FirstName, p.LastName, p.Country, p.Power, p.Stamina, p.Role, teamid,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
 func (db *Database) Team(teamid int) (backend.Team, error) {
@@ -214,6 +252,42 @@ func (db *Database) Team(teamid int) (backend.Team, error) {
 	return team, nil
 }
 
+func (db *Database) Teams(ctx context.Context) ([]backend.Team, error) {
+	teams := []backend.Team{}
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return []backend.Team{}, err
+	}
+	defer tx.Rollback(ctx)
+
+	ids := []int{}
+	row, err := tx.Query(ctx, `SELECT id FROM teams`)
+	if err != nil {
+		return []backend.Team{}, err
+	}
+	for row.Next() {
+		i := 0
+		row.Scan(&i)
+		ids = append(ids, i)
+	}
+
+	for _, id := range ids {
+		team, err := db.Team(id)
+		if err != nil {
+			return []backend.Team{}, err
+		}
+		teams = append(teams, team)
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return []backend.Team{}, err
+	}
+
+	return teams, nil
+}
+
 // RecruitablePlayers return the list of recruitable players
 func (db *Database) RecruitablePlayers(context.Context) ([]backend.Player, error) {
 	row, err := db.Query(
@@ -238,8 +312,8 @@ func (db *Database) RecruitablePlayers(context.Context) ([]backend.Player, error
 	return players, nil
 }
 
-// EditRecruitablePlayers replace recruitable players
-func (db *Database) EditRecruitablePlayers(ctx context.Context, players []backend.Player) error {
+// NewRecruitablePlayers replace recruitable players
+func (db *Database) NewRecruitablePlayers(ctx context.Context, players []backend.Player) error {
 	tx, err := db.Begin(ctx)
 	if err != nil {
 		return err
@@ -270,4 +344,59 @@ func (db *Database) EditRecruitablePlayers(ctx context.Context, players []backen
 	}
 
 	return nil
+}
+
+func (db *Database) Matches(ctx context.Context, seaon, day int) ([]*backend.Game, error) {
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return []*backend.Game{}, err
+	}
+	defer tx.Rollback(ctx)
+
+	ids := []int{}
+	row, err := tx.Query(ctx, `SELECT id FROM teams`)
+	if err != nil {
+		return []*backend.Game{}, err
+	}
+	for row.Next() {
+		i := 0
+		row.Scan(&i)
+		ids = append(ids, i)
+	}
+
+	if day%len(ids) == 0 {
+		log.Warn().Msg("Matches rest day")
+		return []*backend.Game{}, backend.ErrRestDay
+	}
+	idsAway := shift(ids, day)
+
+	games := []*backend.Game{}
+	for i := range ids {
+		home, err := db.Team(ids[i])
+		if err != nil {
+			return []*backend.Game{}, err
+		}
+		away, err := db.Team(idsAway[i])
+		if err != nil {
+			return []*backend.Game{}, err
+		}
+		games = append(games, backend.NewGame(-1, home, away))
+	}
+
+	err = tx.Commit(context.TODO())
+	if err != nil {
+		return []*backend.Game{}, err
+	}
+
+	return games, nil
+}
+
+func shift(a []int, n int) []int {
+	var newArray []int
+	for i := 0; i < n; i++ {
+		newArray = a[1:]
+		newArray = append(newArray, a[0])
+		a = newArray
+	}
+	return a
 }

@@ -9,6 +9,7 @@ require (
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/justinas/alice v1.2.0
 	github.com/rs/cors v1.8.3
+	github.com/rs/zerolog v1.15.0
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.5.0

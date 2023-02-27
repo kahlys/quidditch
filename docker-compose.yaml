@@ -21,15 +21,15 @@ services:
     depends_on:
       - db
 
-  frontend:
-    build:
-      context: .
-      dockerfile: deployment/Dockerfile.front
-    restart: always
-    ports:
-      - 8081:80
-    depends_on:
-      - backend
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: deployment/Dockerfile.front
+  #   restart: always
+  #   ports:
+  #     - 8081:80
+  #   depends_on:
+  #     - backend
 
   # gui:
   #   build:

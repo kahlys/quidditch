@@ -5,20 +5,19 @@ import (
 	"os"
 	"time"
 
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+
 	"github.com/kahlys/quidditch/backend"
 	"github.com/kahlys/quidditch/backend/store"
-	"go.uber.org/zap"
 )
 
 func main() {
-	logger, err := zap.NewDevelopment()
-	if err != nil {
-		os.Exit(1)
-	}
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	db, err := store.NewDatabase("postgres://postgres:postgres@db:5432/postgres?sslmode=disable")
 	if err != nil {
-		logger.Sugar().Fatalw("failed to connect to database", "message", err)
+		log.Fatal().Err(err).Msg("failed to connect to database")
 	}
 
 	for {
@@ -28,9 +27,9 @@ func main() {
 		}
 		break
 	}
-	logger.Sugar().Infow("connected to database")
+	log.Info().Msg("connected to database")
 
-	logger.Sugar().Infow("planner running")
-	p := backend.NewPlanner(logger, db)
+	log.Info().Msg("planner running")
+	p := backend.NewPlanner(db)
 	p.Run()
 }

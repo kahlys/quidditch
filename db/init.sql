@@ -21,6 +21,7 @@ CREATE TABLE players (
   power INTEGER NOT NULL,
   stamina INTEGER NOT NULL,
   position TEXT NOT NULL,
+  starting BOOLEAN NOT NULL DEFAULT false,
   team_id INTEGER REFERENCES teams(id)
 );
 

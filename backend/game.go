@@ -1,11 +1,9 @@
-package game
+package backend
 
 import (
 	"math/rand"
 
-	"go.uber.org/zap"
-
-	"github.com/kahlys/quidditch/backend"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,21 +22,15 @@ type Result struct {
 }
 
 type Game struct {
-	logger *zap.Logger
-
 	id     int
 	result Result
 
-	home backend.Team
-	away backend.Team
+	home Team
+	away Team
 }
 
-func NewGame(logger *zap.Logger, id int, home, away backend.Team) *Game {
+func NewGame(id int, home, away Team) *Game {
 	return &Game{
-		logger: logger,
-
-		id: id,
-
 		home: home,
 		away: away,
 
@@ -51,18 +43,19 @@ func (g *Game) Results() Result { return g.result }
 
 // Simulate a game between two teams.
 func (g *Game) Simulate() {
-	g.logger.Sugar().Infow("Game started", "gameID", g.id, "home", g.home.Name, "away", g.away.Name)
+	log.Info().Str("home", g.home.Name).Str("away", g.away.Name).Int("id", g.id).Msg("Game started")
 
 	failsafe := 0
 	for ; !g.result.End; g.result.Round++ {
 		g.simulateRound()
 		failsafe++
-		if failsafe > 40 {
+		if failsafe > 40000 {
+			log.Warn().Msg("game has been stopped timeout")
 			break
 		}
 	}
 
-	g.logger.Sugar().Infow("Game ended", "gameID", g.id, "home", g.home.Name, "away", g.away.Name, "scoreHome", g.result.ScoreHome, "scoreAway", g.result.ScoreAway)
+	log.Info().Str("home", g.home.Name).Str("away", g.away.Name).Int("id", g.id).Msg("Game ended")
 }
 
 // simulateRound simulate a try when chasers of a team try to goal.
@@ -77,7 +70,7 @@ func (g *Game) simulateRound() {
 	if !snitchAppears(g.result.Round) {
 		return
 	}
-	g.logger.Sugar().Debugw("Snitch Appears", "gameID", g.id, "snitchChance", g.result.Round)
+
 	g.result.End = g.simulateRoundSnitch()
 }
 
@@ -85,21 +78,21 @@ func (g *Game) simulateRound() {
 func (g *Game) simulateRoundSnitch() bool {
 	if g.home.Squad.Seeker.Power >= g.away.Squad.Seeker.Power {
 		if seekerFindAndCatchSnitch(g.home.Squad.Seeker) {
-			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.home.Name, "seeker", g.home.Squad.Seeker.FirstName)
+			log.Debug().Str("seeker", g.home.Squad.Seeker.FirstName).Int("id", g.id).Msg("Seeker catch the golden snitch")
 			g.result.ScoreHome += scoreSnitch
 			return true
 		} else if seekerFindAndCatchSnitch(g.away.Squad.Seeker) {
-			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.away.Name, "seeker", g.away.Squad.Seeker.FirstName)
+			log.Debug().Str("seeker", g.away.Squad.Seeker.FirstName).Int("id", g.id).Msg("Seeker catch the golden snitch")
 			g.result.ScoreAway += scoreSnitch
 			return true
 		}
 	} else {
 		if seekerFindAndCatchSnitch(g.away.Squad.Seeker) {
-			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.away.Name, "seeker", g.away.Squad.Seeker.FirstName)
+			log.Debug().Str("seeker", g.away.Squad.Seeker.FirstName).Int("id", g.id).Msg("Seeker catch the golden snitch")
 			g.result.ScoreAway += scoreSnitch
 			return true
 		} else if seekerFindAndCatchSnitch(g.home.Squad.Seeker) {
-			g.logger.Sugar().Debugw("Seeker catch the golden snitch", "gameID", g.id, "team", g.home.Name, "seeker", g.home.Squad.Seeker.FirstName)
+			log.Debug().Str("seeker", g.home.Squad.Seeker.FirstName).Int("id", g.id).Msg("Seeker catch the golden snitch")
 			g.result.ScoreHome += scoreSnitch
 			return true
 		}
@@ -111,7 +104,7 @@ func snitchAppears(chance int) bool {
 	return diceRoll(chance, 100, 1)
 }
 
-func seekerFindAndCatchSnitch(player backend.Player) bool {
+func seekerFindAndCatchSnitch(player Player) bool {
 	return diceRoll(player.Power, player.Stamina, triesSnitch)
 }
 
