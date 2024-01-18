@@ -1,5 +1,7 @@
 package game
 
+import "math/rand"
+
 const (
 	RoleSeeker = "seeker"
 	RoleChaser = "chaser"
@@ -58,6 +60,22 @@ type Team struct {
 	ID    int
 	Name  string
 	Squad Squad
+}
+
+func (t Team) ChasersPercent() float64 {
+	return float64(t.Squad.Chaser1.Power+t.Squad.Chaser2.Power+t.Squad.Chaser3.Power) / 3.0
+}
+
+func (t Team) isKeeperStops() bool {
+	return rand.Intn(100) > t.Squad.Keeper.Power
+}
+
+func (t Team) BeatersPower() int64 {
+	return int64(t.Squad.Beater1.Power + t.Squad.Beater2.Power)
+}
+
+func (t Team) KeeperPower() int64 {
+	return int64(t.Squad.Keeper.Power)
 }
 
 func (t Team) Players() []Player {
